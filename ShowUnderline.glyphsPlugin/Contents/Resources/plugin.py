@@ -19,7 +19,9 @@ class ShowUnderline(GeneralPlugin):
 		NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(self, "addUnderlineButton:", TABDIDOPEN, objc.nil)
 		NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(self, "removeUnderlineButton:", TABWILLCLOSE, objc.nil)
 		Glyphs.addCallback(self.drawUnderline, DRAWBACKGROUND)
-		Glyphs.addCallback(self.drawUnderline, DRAWINACTIVE)
+		Glyphs.addCallback(self.drawUnderline, DRAWINACTIVE)		
+		Glyphs.addCallback(self.drawStrikeout, DRAWBACKGROUND)
+		Glyphs.addCallback(self.drawStrikeout, DRAWINACTIVE)
 
 		# load icon from bundle
 		iconPath = pathForResource("underLineTemplate", "pdf", __file__)
@@ -68,6 +70,22 @@ class ShowUnderline(GeneralPlugin):
 					thinkness = float(thinkness)
 					position = float(position)
 					rect = NSMakeRect(0, position - (thinkness * 0.5), layer.width, thinkness)
+					NSColor.colorWithDeviceRed_green_blue_alpha_(64.0/255.0, 79.0/255.0, 104.0/255.0, 1).set()
+					NSRectFill(rect)
+		except:
+			NSLog(traceback.format_exc())
+
+	@objc.python_method
+	def drawStrikeout(self, layer, options):
+		try:
+			if Glyphs.boolDefaults["GeorgSeifert_showUnderline"]:
+				master = layer.associatedFontMaster()
+				strikeoutThickness = master.customParameters["strikeoutSize"]
+				strikeoutPosition = master.customParameters["strikeoutPosition"]
+				if strikeoutThickness != None and strikeoutPosition != None:
+					strikeoutThickness = float(strikeoutThickness)
+					strikeoutPosition = float(strikeoutPosition)
+					rect = NSMakeRect(0, strikeoutPosition - (strikeoutThickness * 0.5), layer.width, strikeoutThickness)
 					NSColor.colorWithDeviceRed_green_blue_alpha_(64.0/255.0, 79.0/255.0, 104.0/255.0, 1).set()
 					NSRectFill(rect)
 		except:
